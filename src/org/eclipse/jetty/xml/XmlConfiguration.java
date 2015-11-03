@@ -1143,7 +1143,16 @@ public class XmlConfiguration {
 	 * @throws Exception
 	 *             if the XML configurations cannot be run
 	 */
-	// TODO 这里有个问题不明白，jetty-start调用该类时传递的时什么参数？
+	// 传递参数如下(不换行)：
+	// C:\\Users\\cnpc\\AppData\\Local\\Temp\\start4547679201864065408.properties
+	// E:\\workspace\\jetty9\\jetty-start-test\\src\\test\\resources\\usecases\\home\\etc\\jetty-jmx.xml
+	// E:\\workspace\\jetty9\\jetty-start-test\\src\\test\\resources\\usecases\\home\\etc\\jetty.xml
+	// E:\\workspace\\jetty9\\jetty-start-test\\src\\test\\resources\\usecases\\home\\etc\\jetty-http.xml
+	// E:\\workspace\\jetty9\\jetty-start-test\\src\\test\\resources\\usecases\\home\\etc\\jetty-plus.xml
+	// E:\\workspace\\jetty9\\jetty-start-test\\src\\test\\resources\\usecases\\home\\etc\\jetty-annotations.xml
+	// E:\\workspace\\jetty9\\jetty-start-test\\src\\test\\resources\\usecases\\home\\etc\\jetty-websockets.xml
+	// 其中properties文件中定义了jetty.port,user.dir和jetty.home
+	// 搞懂这个问题后接下来就是看Server工程了
 	public static void main(final String... args) throws Exception {
 		final AtomicReference<Throwable> exception = new AtomicReference<>();
 
@@ -1182,6 +1191,7 @@ public class XmlConfiguration {
 					}
 
 					// For all arguments, load properties
+					// 如果包含等号，直接设置为properties；如果包含.properties文件则直接加载这个文件
 					for (String arg : args) {
 						if (arg.indexOf('=') >= 0) {
 							int i = arg.indexOf('=');
@@ -1194,6 +1204,7 @@ public class XmlConfiguration {
 					}
 
 					// For all arguments, parse XMLs
+					// 解析参数中的xml文件，每个xml文件其实都是一个类的加载方式，
 					XmlConfiguration last = null;
 					Object[] obj = new Object[args.length];
 					for (int i = 0; i < args.length; i++) {
@@ -1220,6 +1231,7 @@ public class XmlConfiguration {
 
 					// For all objects created by XmlConfigurations, start them
 					// if they are lifecycles.
+					// 这里第一次知道，当obj[i]==null时，使用instanceof关键字不会报错
 					for (int i = 0; i < args.length; i++) {
 						if (obj[i] instanceof LifeCycle) {
 							LifeCycle lc = (LifeCycle) obj[i];
